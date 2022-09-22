@@ -5,7 +5,10 @@ def sleep_in(weekday, vacation):
   if weekday == False or vacation == True:
     return True
   return False
-  
+
+
+
+
 #monkey trouble
 def monkey_trouble(a_smile, b_smile):
   if a_smile == True and not b_smile == True:
@@ -69,7 +72,7 @@ def missing_char(str, n):
 #front back
 def front_back(str):
   if len(str) > 1:
-    return str[len(str)-1:len(str)] + str[1:len(str)-1] + str[0:1] 
+    return str[len(str)-1:len(str)] + str[1:len(str)-1] + str[0:1]
   return str
 
 #front3
@@ -77,4 +80,3 @@ def front3(str):
   if len(str) > 2:
     return str[0:3] *3
   return str *3
-
