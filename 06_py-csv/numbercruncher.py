@@ -1,4 +1,4 @@
-#Talia Daniel
+#Talia Daniel Dynamic Turtles
 #SoftDev
 #06
 #2022-09-28
@@ -6,50 +6,89 @@
 
 """
 DISCO:
-atom adds a new line upon save (extra time to debug because i edited csv)
-intro usage of .replace() and .strip()
-how to include weights in random selection
-typecasting converts the entire list value not just contents meaning the list syntax remains
+-csv module
+-csv.reader() function takes in params like delimiter and quotechar
+-delimiter specifies the character used to separate each field. The default is the comma (',')
+-quotechar specifies the character used to surround fields that contain the delimiter character. The default is a double quote (' " ').
+
+on creating own random:
+- 2 methods one creating a cumulative sum and dividing parts of it another creates multiple entries of a job in a list depending on percentage
+- random.uniform()
+
 
 QCC:
+What type/object does csv.reader() return?
 
 OPS SUMMARY:
-- opens file and reads content into a string variable
-- splits the string by \n using .split()
-- splits each entry differently based on whether it has a quotation mark or a comma
-- created dictionary using percentages as keys and names of jobs as values
-- created tuple using the dict keys (percentages)
-- created job list based on the dict values (jobs)
-- chose a job using random.choices() with the weights attribute
-- turned selection into a string removing list syntax and printed in an fstring
+-Uses csv.reader() to parse csv, seperates each field by "," or '"' for fields that contain a comma
+-loop through each line and construct dict of occupation:percent
+
+V1:
+-our random weight function works by checking if associated percent is 100. If not, find associated percent and multiply by 10. Append the percent 
+to the array that number of times. Repeat for every key (occupation)
+-Use randm.choice to get a "weighted" percent
+
+V2:
+- adds jobs to a new dictionary that uses the cumulative sum (previous sum + percentage) as the key
+- random.uniform() generates a random number from 0 to final sum
+- checks through dictionary keys for whether in range and returns the associate value of the key that the randNum is less than
 
 """
-import random
+
+#imports
+import csv
+import random 
 
 dict = {}
 
-file1 = open("occupations.csv")
-string = file1.read()
-each_entry = string.split("\n")
-for i in each_entry:
-    if '"' in i:
-        parsed_arr = i.strip('"').split('"')
-    else:
-        parsed_arr = i.split(",")
-    #print(parsed_arr)
-    #print(parsed_arr[1])
-    occupation = parsed_arr[0]
-    percentage = float(parsed_arr[1].replace(",",""))
-    dict[percentage] = []
-    dict[percentage].append(occupation)
+with open("occupations.csv", 'r') as csvfile:
+    csvreader = csv.reader(csvfile,delimiter=",",quotechar='"')
+    for lines in csvreader:
+        occupation = lines[0]
+        percent = float(lines[1])
+        dict[occupation] = percent
+    all_jobs = list(dict.keys())
+    all_percents = list(dict.values())
 
+
+def doRandomWeights():
+    #creates list and total slices
+    arr = []
+    total = 100
+    # adds the job to the list corresponding number of times as percentage
+    #(legal, legal, legal, education training and library, education training and library)
+    for job in all_jobs:
+        if dict[job] != total:
+            percent = dict[job]
+            #takes percent and multiplies by 10 to get rid of percent
+            weighted = int(percent * 10)
+        else:
+            arr.append(job)
+            break
+        for i in range(weighted):
+            arr.append(job)
+    return random.choice(arr)
+
+
+def doRandomWeights2():
+    #create sum var and new dict
+    sums = 0
+    weights = {}
+    #goes through jobs and makes cumulative sum to add to weights
+    for job in all_jobs:
+        percent = dict[job]
+        sums += percent
+        weights[sums] = job
+    choice = random.uniform(0, sums)
+    #goes through weights and if randNum is in range returns that entry
+    for key in weights:
+        if(choice < key):
+            return weights[key]
+    return 0
+        
     
-#print(dict)
-
-all_percents = tuple(dict.keys())
-all_occupations_arr = list(dict.values())
-randomWeightedPercent = random.choices(all_occupations_arr,weights=(all_percents))
-stringV = str(randomWeightedPercent).strip("[").strip("]").strip("'")
-print(f"{stringV}")
-
-#print(dict[all_percents[random.randrange(len(all_percents))]])
+        
+#randomWeightedJob = random.choices(all_jobs,weights=all_percents)
+#print(randomWeightedJob)
+print(doRandomWeights())
+print(doRandomWeights2())
